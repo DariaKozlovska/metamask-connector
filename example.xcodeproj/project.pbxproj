@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		2B6079842D9B0DDC003D963A /* metamask-ios-sdk in Frameworks */ = {isa = PBXBuildFile; productRef = 2B6079832D9B0DDC003D963A /* metamask-ios-sdk */; };
+		2BA5EC772D9DD3E400F70F84 /* web3-zksync.swift in Frameworks */ = {isa = PBXBuildFile; productRef = 2BA5EC762D9DD3E400F70F84 /* web3-zksync.swift */; };
+		2BA5EC792D9DD3E400F70F84 /* web3.swift in Frameworks */ = {isa = PBXBuildFile; productRef = 2BA5EC782D9DD3E400F70F84 /* web3.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +29,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2BA5EC772D9DD3E400F70F84 /* web3-zksync.swift in Frameworks */,
+				2BA5EC792D9DD3E400F70F84 /* web3.swift in Frameworks */,
 				2B6079842D9B0DDC003D963A /* metamask-ios-sdk in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -71,6 +75,8 @@
 			name = example;
 			packageProductDependencies = (
 				2B6079832D9B0DDC003D963A /* metamask-ios-sdk */,
+				2BA5EC762D9DD3E400F70F84 /* web3-zksync.swift */,
+				2BA5EC782D9DD3E400F70F84 /* web3.swift */,
 			);
 			productName = example;
 			productReference = 2B4639E42D99B8FA0062D263 /* example.app */;
@@ -102,6 +108,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				2B6079822D9B0DDC003D963A /* XCRemoteSwiftPackageReference "metamask-ios-sdk" */,
+				2BA5EC752D9DD3E400F70F84 /* XCRemoteSwiftPackageReference "web3.swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2B4639E52D99B8FA0062D263 /* Products */;
@@ -345,6 +352,14 @@
 				minimumVersion = 0.8.10;
 			};
 		};
+		2BA5EC752D9DD3E400F70F84 /* XCRemoteSwiftPackageReference "web3.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/argentlabs/web3.swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.6.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -352,6 +367,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2B6079822D9B0DDC003D963A /* XCRemoteSwiftPackageReference "metamask-ios-sdk" */;
 			productName = "metamask-ios-sdk";
+		};
+		2BA5EC762D9DD3E400F70F84 /* web3-zksync.swift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2BA5EC752D9DD3E400F70F84 /* XCRemoteSwiftPackageReference "web3.swift" */;
+			productName = "web3-zksync.swift";
+		};
+		2BA5EC782D9DD3E400F70F84 /* web3.swift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2BA5EC752D9DD3E400F70F84 /* XCRemoteSwiftPackageReference "web3.swift" */;
+			productName = web3.swift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

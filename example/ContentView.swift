@@ -65,56 +65,55 @@ struct ContentView: View {
                         }
                     }
                 }
-
-                if metaMaskSDK.account.isEmpty {
+                
+                if !metaMaskSDK.account.isEmpty {
                     Section {
-
-                        ZStack {
-                            Button {
-                                Task {
-                                    await connectSDK()
-                                }
-                            } label: {
-                                Text("Connect to MetaMask")
-                                    .frame(maxWidth: .infinity, maxHeight: 32)
+                        Group {
+                            NavigationLink("Transact") {
+                                TransactionView().environmentObject(metaMaskSDK)
                             }
 
-                            if showProgressView {
-                                ProgressView()
-                                    .scaleEffect(1.5, anchor: .center)
-                                    .progressViewStyle(CircularProgressViewStyle(tint: .black))
-                            }
                         }
-                        .alert(isPresented: $showError) {
-                            Alert(
-                                title: Text("Error"),
-                                message: Text(errorMessage)
-                            )
-                        }
-                    } footer: {
-                        Text(connectAndSignResult)
                     }
                 }
 
-                if !metaMaskSDK.account.isEmpty {
-                    Section {
-                        Button {
-                            metaMaskSDK.clearSession()
-                        } label: {
-                            Text("Clear Session")
-                                .frame(maxWidth: .infinity, maxHeight: 32)
-                        }
-
-                        Button {
-                            Task {
-                                await disconnectSDK()
-                            }
-                        } label: {
-                            Text("Disconnect")
-                                .frame(maxWidth: .infinity, maxHeight: 32)
-                        }
-
+                if metaMaskSDK.account.isEmpty {
+                    Button(action: {
+                        Task { await connectSDK() }
+                    }) {
+                        Text("Connect to MetaMask")
+                            .frame(maxWidth: .infinity, maxHeight: 44)
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
                     }
+                    .padding()
+                    .alert(isPresented: $showError) {
+                        Alert(title: Text("Error"), message: Text(errorMessage))
+                    }
+                } else {
+                    HStack {
+                        Button(action: {
+                            metaMaskSDK.clearSession()
+                        }) {
+                            Text("Clear Session")
+                                .frame(maxWidth: .infinity, maxHeight: 44)
+                                .background(Color.gray)
+                                .foregroundColor(.white)
+                                .cornerRadius(8)
+                        }
+                        
+                        Button(action: {
+                            Task { await disconnectSDK() }
+                        }) {
+                            Text("Disconnect")
+                                .frame(maxWidth: .infinity, maxHeight: 44)
+                                .background(Color.blue)
+                                .foregroundColor(.white)
+                                .cornerRadius(8)
+                        }
+                    }
+                    .padding()
                 }
             }
         }
