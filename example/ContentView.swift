@@ -15,7 +15,7 @@ private let DAPP_SCHEME = "dubdapp"
 
 @MainActor
 struct ContentView: View {
-
+    
     // We recommend adding support for Infura API for read-only RPCs (direct calls) via SDKOptions
     @ObservedObject var metaMaskSDK = MetaMaskSDK.shared(
         AppMetadata(
@@ -23,21 +23,21 @@ struct ContentView: View {
             url: "https://example-wallet-metamask.com"),
         transport: .socket,
         sdkOptions: nil
-        )
-
+    )
+    
     @State private var connected: Bool = false
     @State private var status: String = "Offline"
-
+    
     @State private var errorMessage = ""
     @State private var showError = false
-
+    
     @State private var connectAndSignResult = ""
     @State private var isConnect = true
     @State private var isConnectAndSign = false
     @State private var isConnectWith = false
-
+    
     @State private var showProgressView = false
-
+    
     var body: some View {
         NavigationView {
             List {
@@ -49,14 +49,14 @@ struct ContentView: View {
                             Spacer()
                             Text(status)
                         }
-
+                        
                         HStack {
                             Text("Chain ID")
                                 .bold()
                             Spacer()
                             Text(metaMaskSDK.chainId)
                         }
-
+                        
                         HStack {
                             Text("Account")
                                 .bold()
@@ -66,17 +66,34 @@ struct ContentView: View {
                     }
                 }
                 
+                if !metaMaskSDK.account.isEmpty{
+                    Section{
+                        Group{
+                            Button("Personal sign") {
+                                Task {
+                                    do {
+                                        try await signMessage()
+                                    } catch {
+                                        print("Error occurred: \(error)")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                }
+                
                 if !metaMaskSDK.account.isEmpty {
                     Section {
                         Group {
                             NavigationLink("Transact") {
                                 TransactionView().environmentObject(metaMaskSDK)
                             }
-
+                            
                         }
                     }
                 }
-
+                
                 if metaMaskSDK.account.isEmpty {
                     Button(action: {
                         Task { await connectSDK() }
@@ -118,38 +135,60 @@ struct ContentView: View {
             }
         }
     }
-
-    func connectSDK() async {
-        metaMaskSDK.clearSession()
         
-        showProgressView = true
-        let result = await metaMaskSDK.connect()
-        showProgressView = false
-
-        switch result {
-        case .success:
-            status = "Online"
-        case let .failure(error):
-            errorMessage = error.localizedDescription
-            showError = true
+        func signMessage() async {
+            let address = metaMaskSDK.account
+            let message = "Hello from MetaMask signer!"
+            
+            let params: [String] = [message, address]
+            
+            let signRequest = EthereumRequest(
+                method: .personalSign,
+                params: params
+            )
+            
+            let result = await metaMaskSDK.request(signRequest)
+            
+            switch result {
+            case .success(let signature):
+                print("Signature: \(signature)")
+            case .failure(let error):
+                print("Sign Error: \(error.localizedDescription)")
+            }
+            
+        }
+        
+        func connectSDK() async {
+            metaMaskSDK.clearSession()
+            
+            showProgressView = true
+            let result = await metaMaskSDK.connect()
+            showProgressView = false
+            
+            switch result {
+            case .success:
+                status = "Online"
+            case let .failure(error):
+                errorMessage = error.localizedDescription
+                showError = true
+            }
+        }
+        
+        func shortenAddress(_ address: String) -> String {
+            guard address.count > 8 else { return address }
+            let start = address.prefix(4)
+            let end = address.suffix(4)
+            return "\(start)...\(end)"
+        }
+        
+        func disconnectSDK() async {
+            print("Disconnecting from MetaMask...")
+            metaMaskSDK.clearSession()  // Czyści dane lokalne
+            await metaMaskSDK.disconnect() // Próbuje odłączyć MetaMaska
+            status = "Offline"
         }
     }
-    
-    func shortenAddress(_ address: String) -> String {
-        guard address.count > 8 else { return address }
-        let start = address.prefix(4)
-        let end = address.suffix(4)
-        return "\(start)...\(end)"
-    }
-    
-    func disconnectSDK() async {
-        print("Disconnecting from MetaMask...")
-        metaMaskSDK.clearSession()  // Czyści dane lokalne
-        await metaMaskSDK.disconnect() // Próbuje odłączyć MetaMaska
-        status = "Offline"
-    }
 
-}
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
