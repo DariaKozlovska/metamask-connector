@@ -69,14 +69,17 @@ struct ContentView: View {
                 if !metaMaskSDK.account.isEmpty{
                     Section{
                         Group{
-                            Button("Personal sign") {
-                                Task {
-                                    do {
-                                        try await signMessage()
-                                    } catch {
-                                        print("Error occurred: \(error)")
-                                    }
-                                }
+//                            Button("Personal sign") {
+//                                Task {
+//                                    do {
+//                                        try await signMessage()
+//                                    } catch {
+//                                        print("Error occurred: \(error)")
+//                                    }
+//                                }
+//                            }
+                            NavigationLink("SSign View"){
+                                SignView().environmentObject(metaMaskSDK)
                             }
                         }
                     }
