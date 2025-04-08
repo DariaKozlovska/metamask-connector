@@ -15,6 +15,8 @@ private let DAPP_SCHEME = "dubdapp"
 
 @MainActor
 struct ContentView: View {
+    @State var selectedTransport: Transport = .deeplinking(dappScheme: DAPP_SCHEME)
+    @State private var dappScheme: String = DAPP_SCHEME
     
     // We recommend adding support for Infura API for read-only RPCs (direct calls) via SDKOptions
     @ObservedObject var metaMaskSDK = MetaMaskSDK.shared(
@@ -69,18 +71,18 @@ struct ContentView: View {
                 if !metaMaskSDK.account.isEmpty{
                     Section{
                         Group{
-//                            Button("Personal sign") {
-//                                Task {
-//                                    do {
-//                                        try await signMessage()
-//                                    } catch {
-//                                        print("Error occurred: \(error)")
-//                                    }
-//                                }
-//                            }
-                            NavigationLink("SSign View"){
-                                SignView().environmentObject(metaMaskSDK)
+                            Button("Personal sign") {
+                                Task {
+                                    do {
+                                        try await signMessage()
+                                    } catch {
+                                        print("Error occurred: \(error)")
+                                    }
+                                }
                             }
+//                            NavigationLink("Sign View"){
+//                                SignView().environmentObject(metaMaskSDK)
+//                            }
                         }
                     }
                     
@@ -134,6 +136,9 @@ struct ContentView: View {
                         }
                     }
                     .padding()
+                    .alert(isPresented: $showError) {
+                        Alert(title: Text("Signature Status"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
+                    }
                 }
             }
         }
@@ -155,8 +160,20 @@ struct ContentView: View {
             switch result {
             case .success(let signature):
                 print("Signature: \(signature)")
+                DispatchQueue.main.async {
+                    errorMessage = "Signature successful!"
+                    showError = true
+                }
             case .failure(let error):
                 print("Sign Error: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    if error.localizedDescription.contains("User rejected the request") {
+                        errorMessage = "Signature request was rejected by user"
+                    } else {
+                        errorMessage = "Sign Error: \(error.localizedDescription)"
+                    }
+                    showError = true
+                }
             }
             
         }
@@ -166,6 +183,7 @@ struct ContentView: View {
             
             showProgressView = true
             let result = await metaMaskSDK.connect()
+            print(result)
             showProgressView = false
             
             switch result {
@@ -185,9 +203,8 @@ struct ContentView: View {
         }
         
         func disconnectSDK() async {
-            print("Disconnecting from MetaMask...")
             metaMaskSDK.clearSession()  // Czyści dane lokalne
-            await metaMaskSDK.disconnect() // Próbuje odłączyć MetaMaska
+            metaMaskSDK.disconnect() // Próbuje odłączyć MetaMaska
             status = "Offline"
         }
     }
